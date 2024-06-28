@@ -1,23 +1,41 @@
--- EXAMPLE 
-local on_attach = require("nvchad.configs.lspconfig").on_attach
-local on_init = require("nvchad.configs.lspconfig").on_init
-local capabilities = require("nvchad.configs.lspconfig").capabilities
+local configs = require("nvchad.configs.lspconfig")
+
+local on_attach = configs.on_attach
+local on_init = configs.on_init
+local capabilities = configs.capabilities
 
 local lspconfig = require "lspconfig"
-local servers = { "html", "cssls" }
 
--- lsps with default config
+-- if you just want default config for the servers then put them in a table
+local servers = { "html", "cssls", "tsserver", "clangd", "gopls", "gradle_ls" }
+
+local function organize_imports()
+  local params = {
+    command = "_typescript.organizeImports",
+    arguments = { vim.api.nvim_buf_get_name(0) },
+  }
+  vim.lsp.buf.execute_command(params)
+end
+
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {
     on_attach = on_attach,
-    on_init = on_init,
     capabilities = capabilities,
+    commands = {
+      OrganizeImports = {
+        organize_imports,
+        description = "Organize Imports",
+      },
+    },
+    settings = {
+      gopls = {
+        completeUnimported = true,
+        usePlaceholders = true,
+        analyses = {
+          unusedparams = true,
+        }
+      }
+    }
   }
+  lspconfig.prismals.setup {}
 end
-
--- typescript
-lspconfig.tsserver.setup {
-  on_attach = on_attach,
-  on_init = on_init,
-  capabilities = capabilities,
-}
