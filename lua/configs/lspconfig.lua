@@ -16,7 +16,7 @@ local function setup_servers(servers)
 end
 
 -- Список серверов для настройки
-local servers = { "html", "cssls", "tsserver", "clangd", "gopls", "gradle_ls", "prismals", "pyright" }
+local servers = { "html", "cssls", "tsserver", "clangd", "gopls", "gradle_ls", "prismals", "pyright", "lua_ls" }
 setup_servers(servers)
 
 -- Дополнительные настройки для pyright
@@ -35,7 +35,7 @@ lspconfig.pyright.setup {
   capabilities = capabilities,
 }
 
--- Настройка null-ls для использования black
+-- Настройка null_ls для использования black
 null_ls.setup {
   sources = {
     null_ls.builtins.formatting.black,

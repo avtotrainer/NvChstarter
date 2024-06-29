@@ -31,7 +31,23 @@ return {
     "hrsh7th/vim-vsnip",
     after = "nvim-cmp",
   },
-
+  -----------------
+  {
+    "williamboman/mason.nvim",
+    config = function()
+      require("mason").setup()
+    end,
+  },
+  {
+    "williamboman/mason-lspconfig.nvim",
+    after = "mason.nvim",
+    config = function()
+      require("mason-lspconfig").setup {
+        ensure_installed = { "lua-language-server", "pyright", "tsserver", "html", "cssls", "clangd", "gopls", "prismals" }
+      }
+    end,
+  },
+  ------------
   -- Плагины для LSP
   {
     "neovim/nvim-lspconfig",
@@ -40,21 +56,21 @@ return {
       require "configs.lspconfig"
     end,
   },
+  -- {
+  --  "williamboman/mason.nvim",
+  --  config = function()
+  --    require("mason").setup()
+  --    require("mason-lspconfig").setup {
+  --      ensure_installed = { "lua-language-server", "pyright", "tsserver", "html", "cssls", "clangd", "gopls", "prismals" }
+  --    }
+  --  end,
+  -- },
+  -- {
+  --  "williamboman/mason-lspconfig.nvim",
+  --  after = "mason.nvim",
+  -- },
   {
-    "williamboman/mason.nvim",
-    config = function()
-      require("mason").setup()
-      require("mason-lspconfig").setup {
-        ensure_installed = { "lua-language-server", "pyright", "tsserver", "html", "cssls", "clangd", "gopls", "prismals" }
-      }
-    end,
-  },
-  {
-    "williamboman/mason-lspconfig.nvim",
-    after = "mason.nvim",
-  },
-  {
-    "jose-elias-alvarez/null-ls.nvim",  -- Добавление null-ls плагина
+    "jose-elias-alvarez/null-ls.nvim", -- Добавление null-ls плагина
     config = function()
       require("null-ls").setup({
         sources = {
@@ -73,7 +89,23 @@ return {
       })
     end,
   },
-
+  {
+    "christoomey/vim-tmux-navigator",
+    lazy = false,
+    cmd = {
+      "TmuxNavigateLeft",
+      "TmuxNavigateDown",
+      "TmuxNavigateUp",
+      "TmuxNavigateRight",
+      "TmuxNavigatePrevious",
+    },
+  },
+  {
+    "stevearc/conform.nvim",
+    event = "BufWritePre",
+    config = function()
+      require "configs.conform"
+    end,
+  },
   -- Другие плагины...
 }
-

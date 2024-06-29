@@ -1,4 +1,2 @@
-def aname()
-  pass
-
-
+def fun():
+    pass

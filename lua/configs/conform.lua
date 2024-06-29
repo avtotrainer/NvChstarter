@@ -7,6 +7,7 @@ local options = {
     typescript = { "prettier" },
     typescriptreact = { "prettier" },
     javascriptreact = { "prettier" },
+    python = { "black" }, -- добавление форматтера для Python
   },
 
   format_on_save = {
