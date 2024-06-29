@@ -1,7 +1,7 @@
 return {
   {
     "stevearc/conform.nvim",
-    event = 'BufWritePre', -- uncomment for format on save
+    event = "BufWritePre", -- Запускать перед сохранением файла
     config = function()
       require "configs.conform"
     end,
@@ -29,7 +29,9 @@ return {
       require "configs.lspconfig"
     end,
   },
-  { "nvim-neotest/nvim-nio" },
+  {
+    "nvim-neotest/nvim-nio",
+  },
   {
     "williamboman/mason.nvim",
     opts = {
@@ -63,13 +65,6 @@ return {
     },
   },
   {
-  {
-    "neovim/nvim-lspconfig",
-    config = function()
-      require "configs.lspconfig"
-    end,
-  },
-  {
     "windwp/nvim-ts-autotag",
     event = "VeryLazy",
     config = function()
@@ -83,6 +78,7 @@ return {
       require("better_escape").setup()
     end,
   },
+  {
     "mfussenegger/nvim-lint",
     event = "VeryLazy",
     config = function()
@@ -93,32 +89,11 @@ return {
     "Exafunction/codeium.vim",
     lazy = false,
   },
-  -- These are some examples, uncomment them if you want to see them work!
-  -- {
-  --   "neovim/nvim-lspconfig",
-  --   config = function()
-  --     require("nvchad.configs.lspconfig").defaults()
-  --     require "configs.lspconfig"
-  --   end,
-  -- },
-  --
-  -- {
-  -- 	"williamboman/mason.nvim",
-  -- 	opts = {
-  -- 		ensure_installed = {
-  -- 			"lua-language-server", "stylua",
-  -- 			"html-lsp", "css-lsp" , "prettier"
-  -- 		},
-  -- 	},
-  -- },
-  --
-  -- {
-  -- 	"nvim-treesitter/nvim-treesitter",
-  -- 	opts = {
-  -- 		ensure_installed = {
-  -- 			"vim", "lua", "vimdoc",
-  --      "html", "css"
-  -- 		},
-  -- 	},
-  -- },
+  {
+    "jose-elias-alvarez/null-ls.nvim",
+    event = "BufReadPre",
+    config = function()
+      require "configs.null-ls"
+    end,
+  },
 }

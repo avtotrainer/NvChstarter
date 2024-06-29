@@ -1,4 +1,4 @@
-local configs = require("nvchad.configs.lspconfig")
+local configs = require "nvchad.configs.lspconfig"
 
 local on_attach = configs.on_attach
 local on_init = configs.on_init
@@ -33,9 +33,37 @@ for _, lsp in ipairs(servers) do
         usePlaceholders = true,
         analyses = {
           unusedparams = true,
-        }
-      }
-    }
+        },
+      },
+    },
   }
-  lspconfig.prismals.setup {}
 end
+
+-- Настройка Prisma LSP
+lspconfig.prismals.setup {
+  on_attach = on_attach,
+  capabilities = capabilities,
+}
+
+-- Настройка Pyright
+lspconfig.pyright.setup {
+  on_attach = function(client, bufnr)
+    if client.resolved_capabilities.document_formatting then
+      vim.cmd "autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()"
+    end
+  end,
+  capabilities = capabilities,
+}
+
+-- Настройка null-ls для использования black
+local null_ls = require "null-ls"
+null_ls.setup {
+  sources = {
+    null_ls.builtins.formatting.black,
+  },
+  on_attach = function(client)
+    if client.resolved_capabilities.document_formatting then
+      vim.cmd "autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()"
+    end
+  end,
+}
