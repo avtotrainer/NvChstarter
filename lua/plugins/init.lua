@@ -1,27 +1,38 @@
 return {
+  -- Плагины для автодополнения
   {
-    "stevearc/conform.nvim",
-    event = "BufWritePre", -- Запускать перед сохранением файла
+    "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
     config = function()
-      require "configs.conform"
+      require "configs.cmp"
     end,
   },
   {
-    "christoomey/vim-tmux-navigator",
-    lazy = false,
-    cmd = {
-      "TmuxNavigateLeft",
-      "TmuxNavigateDown",
-      "TmuxNavigateUp",
-      "TmuxNavigateRight",
-      "TmuxNavigatePrevious",
-    },
+    "hrsh7th/cmp-nvim-lsp",
+    after = "nvim-cmp",
   },
   {
-    "stevearc/dressing.nvim",
-    lazy = false,
-    opts = {},
+    "hrsh7th/cmp-buffer",
+    after = "nvim-cmp",
   },
+  {
+    "hrsh7th/cmp-path",
+    after = "nvim-cmp",
+  },
+  {
+    "hrsh7th/cmp-cmdline",
+    after = "nvim-cmp",
+  },
+  {
+    "hrsh7th/cmp-vsnip",
+    after = "nvim-cmp",
+  },
+  {
+    "hrsh7th/vim-vsnip",
+    after = "nvim-cmp",
+  },
+
+  -- Плагины для LSP
   {
     "neovim/nvim-lspconfig",
     config = function()
@@ -30,70 +41,39 @@ return {
     end,
   },
   {
-    "nvim-neotest/nvim-nio",
-  },
-  {
     "williamboman/mason.nvim",
-    opts = {
-      ensure_installed = {
-        "lua-language-server",
-        "stylua",
-        "html-lsp",
-        "css-lsp",
-        "prettier",
-        "eslint-lsp",
-        "gopls",
-        "js-debug-adapter",
-        "typescript-language-server",
-      },
-    },
-  },
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = {
-      ensure_installed = {
-        "vim",
-        "lua",
-        "vimdoc",
-        "html",
-        "css",
-        "typescript",
-        "javascript",
-        "go",
-        "python",
-      },
-    },
-  },
-  {
-    "windwp/nvim-ts-autotag",
-    event = "VeryLazy",
     config = function()
-      require("nvim-ts-autotag").setup()
+      require("mason").setup()
+      require("mason-lspconfig").setup {
+        ensure_installed = { "lua-language-server", "pyright", "tsserver", "html", "cssls", "clangd", "gopls", "prismals" }
+      }
     end,
   },
   {
-    "max397574/better-escape.nvim",
-    event = "InsertEnter",
-    config = function()
-      require("better_escape").setup()
-    end,
+    "williamboman/mason-lspconfig.nvim",
+    after = "mason.nvim",
   },
   {
-    "mfussenegger/nvim-lint",
-    event = "VeryLazy",
+    "jose-elias-alvarez/null-ls.nvim",  -- Добавление null-ls плагина
     config = function()
-      require "configs.lint"
+      require("null-ls").setup({
+        sources = {
+          require("null-ls").builtins.formatting.black,
+        },
+        on_attach = function(client, bufnr)
+          if client.server_capabilities.documentFormattingProvider then
+            vim.api.nvim_create_autocmd("BufWritePre", {
+              buffer = bufnr,
+              callback = function()
+                vim.lsp.buf.format({ bufnr = bufnr })
+              end,
+            })
+          end
+        end,
+      })
     end,
   },
-  {
-    "Exafunction/codeium.vim",
-    lazy = false,
-  },
-  {
-    "jose-elias-alvarez/null-ls.nvim",
-    event = "BufReadPre",
-    config = function()
-      require "configs.null-ls"
-    end,
-  },
+
+  -- Другие плагины...
 }
+

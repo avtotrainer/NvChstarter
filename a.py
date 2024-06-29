@@ -1,5 +1,4 @@
-import datetim
+def aname()
+  pass
 
 
-def aname(self):
-    pass

@@ -1,14 +1,59 @@
+local lspconfig = require "lspconfig"
+local null_ls = require "null-ls"
 local configs = require "nvchad.configs.lspconfig"
 
 local on_attach = configs.on_attach
-local on_init = configs.on_init
 local capabilities = configs.capabilities
 
-local lspconfig = require "lspconfig"
+-- Общая функция для настройки LSP серверов
+local function setup_servers(servers)
+  for _, lsp in ipairs(servers) do
+    lspconfig[lsp].setup {
+      on_attach = on_attach,
+      capabilities = capabilities,
+    }
+  end
+end
 
--- if you just want default config for the servers then put them in a table
-local servers = { "html", "cssls", "tsserver", "clangd", "gopls", "gradle_ls" }
+-- Список серверов для настройки
+local servers = { "html", "cssls", "tsserver", "clangd", "gopls", "gradle_ls", "prismals", "pyright" }
+setup_servers(servers)
 
+-- Дополнительные настройки для pyright
+lspconfig.pyright.setup {
+  on_attach = function(client, bufnr)
+    if client.server_capabilities.documentFormattingProvider then
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        buffer = bufnr,
+        callback = function()
+          vim.lsp.buf.format({ bufnr = bufnr })
+        end,
+      })
+    end
+    on_attach(client, bufnr)
+  end,
+  capabilities = capabilities,
+}
+
+-- Настройка null-ls для использования black
+null_ls.setup {
+  sources = {
+    null_ls.builtins.formatting.black,
+  },
+  on_attach = function(client, bufnr)
+    if client.server_capabilities.documentFormattingProvider then
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        buffer = bufnr,
+        callback = function()
+          vim.lsp.buf.format({ bufnr = bufnr })
+        end,
+      })
+    end
+    on_attach(client, bufnr)
+  end,
+}
+
+-- Специальная команда для организации импортов в TypeScript
 local function organize_imports()
   local params = {
     command = "_typescript.organizeImports",
@@ -17,53 +62,12 @@ local function organize_imports()
   vim.lsp.buf.execute_command(params)
 end
 
-for _, lsp in ipairs(servers) do
-  lspconfig[lsp].setup {
-    on_attach = on_attach,
-    capabilities = capabilities,
-    commands = {
-      OrganizeImports = {
-        organize_imports,
-        description = "Organize Imports",
-      },
-    },
-    settings = {
-      gopls = {
-        completeUnimported = true,
-        usePlaceholders = true,
-        analyses = {
-          unusedparams = true,
-        },
-      },
-    },
-  }
-end
-
--- Настройка Prisma LSP
-lspconfig.prismals.setup {
-  on_attach = on_attach,
-  capabilities = capabilities,
-}
-
--- Настройка Pyright
-lspconfig.pyright.setup {
+-- Добавление команды OrganizeImports для tsserver
+lspconfig.tsserver.setup {
   on_attach = function(client, bufnr)
-    if client.resolved_capabilities.document_formatting then
-      vim.cmd "autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()"
-    end
+    vim.api.nvim_buf_create_user_command(bufnr, "OrganizeImports", organize_imports, {})
+    on_attach(client, bufnr)
   end,
   capabilities = capabilities,
 }
 
--- Настройка null-ls для использования black
-local null_ls = require "null-ls"
-null_ls.setup {
-  sources = {
-    null_ls.builtins.formatting.black,
-  },
-  on_attach = function(client)
-    if client.resolved_capabilities.document_formatting then
-      vim.cmd "autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()"
-    end
-  end,
-}
